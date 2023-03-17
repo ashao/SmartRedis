@@ -35,6 +35,7 @@ on:
     branches:
       - master
       - develop
+      - debug_actions
   pull_request:
     branches:
       - master
@@ -64,7 +65,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04] # cannot test on macOS as docker isn't supported on Mac
         rai_v: [1.2.4, 1.2.5] # versions of RedisAI
-        py_v: ['3.7.x', '3.8.x', '3.9.x'] # versions of Python
+        py_v: ['3.7.x', '3.8.x', '3.9.1', '3.9.2', '3.9.3', '3.9.16'] # versions of Python
         compiler: [intel, 8, 9, 10, 11] # intel compiler, and versions of GNU compiler
     env:
       FC: gfortran-${{ matrix.compiler }}
@@ -161,7 +162,7 @@ jobs:
                        --loadmodule $REDISAI_MODULES &&
           popd &&
           export SSDB=$SSDB_SINGLE SMARTREDIS_TEST_CLUSTER=False &&
-          utils/check_redis.sh $PORT &&
+          utils/check_redis.sh $PORT 5 10 single_scratch/single.log &&
           make test-verbose-with-coverage COV_FLAGS="--cov=./src/python/module/smartredis/ --cov-report=xml --cov-append"
 
       - name: Clustered DB tests

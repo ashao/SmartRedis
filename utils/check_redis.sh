@@ -5,6 +5,7 @@
 port="${1:-6780}"
 max_tries="${2:-10}"
 sleep_interval=${3:-5}
+log_file=${4:-foo}
 
 # Set the correct option for either connecting via port or socket
 # Note the "bash"-ism below checks to see if port is an integer
@@ -25,5 +26,6 @@ for i in {1..$max_tries}; do
   fi
 done
 
+cat $log_file
 echo "Database could not be found on port $port"
 exit 1
