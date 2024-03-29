@@ -310,8 +310,11 @@ void Tensor<T>::_set_tensor_data(const void* src_data,
         case SRMemLayoutContiguous:
             std::memcpy(_data, src_data, n_bytes);
             break;
-        case SRMemLayoutFortranContiguous:
-            _f_to_c_memcpy((T*)_data, (const T*)src_data, dims);
+	case SRMemLayoutFortranContiguous:
+            if (std::count(dims.begin(), dims.end(), 1) > 1)
+                _f_to_c_memcpy((T*)_data, (const T*)src_data, dims);
+            else 
+                std::memcpy(_data, src_data, n_bytes);
             break;
         case SRMemLayoutNested:
             _copy_nested_to_contiguous(

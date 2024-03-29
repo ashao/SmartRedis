@@ -29,6 +29,7 @@
 #ifndef SMARTREDIS_TENSOR_H
 #define SMARTREDIS_TENSOR_H
 
+#include <algorithm>
 #include <stdlib.h>
 #include <string>
 #include <stdexcept>
