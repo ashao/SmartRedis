@@ -126,6 +126,7 @@ list(APPEND EXECUTABLES
 	 client_test_logging
 	 client_test_errors
 	 client_test_configoptions
+	 test_fortran_c_interop
 )
 
 # Build the tests

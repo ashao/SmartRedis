@@ -36,7 +36,7 @@
 
   ! Determine the shape of the array and the length of each dimension
   c_n_dims = size(dims)
-
+  ! array = reshape(array, shape=shape(c_n_dims:1:-1), order=[(i, i=c_n_dims, 1, -1)])
   ! Create the pointer to the data array
   data_ptr = c_loc(data)
 

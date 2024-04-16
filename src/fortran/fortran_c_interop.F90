@@ -38,6 +38,8 @@ integer, parameter, public :: C_MAX_STRING = 255 !< A bug in gfortran prevents t
                                                  !! string passed to the C interface
 #include "enum_fortran.inc"
 public :: convert_char_array_to_c
+public :: c_index
+public :: unravel_index
 
 contains
 
@@ -95,5 +97,31 @@ function convert_char_array_to_c(character_array_f, character_array_c, string_pt
   ptr_to_string_ptrs = c_loc(string_ptrs)
 
 end function convert_char_array_to_c
+
+!> Calculate the index in a flattened representation of an ND array
+integer function c_index(indices, dims) result(idx)
+   integer, dimension(:) :: indices !< The indices of the ND array
+   integer, dimension(:) :: dims    !< Dimensions of the ND array
+   integer :: i
+   idx = indices(size(indices))
+   do i = size(indices)-1, 1, -1
+       idx = idx + (indices(i) - 1) * product(dims(i+1:))
+   end do
+end function c_index
+
+!> Calculate the index of an ND array given the ith element
+subroutine unravel_index(i, dims, indices)
+    integer, intent(in) :: i
+    integer, dimension(:), intent(in) :: dims
+    integer, dimension(:), intent(out) :: indices
+    integer :: j, prod
+
+    prod = i - 1
+    ! do j = size(dims), 1, -1
+    do j = 1, size(dims)
+        indices(j) = mod(prod, dims(j)) + 1
+        prod = prod / dims(j)
+    end do
+end subroutine unravel_index
 
 end module fortran_c_interop
