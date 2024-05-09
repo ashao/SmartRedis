@@ -33,6 +33,10 @@
   integer(kind=c_size_t) :: name_length
   integer(kind=c_size_t), target :: c_dims(size(dims))
   integer(kind=enum_kind) :: data_type
+  logical :: convert_to_c_
+
+  convert_to_c_ = .true.
+  if(PRESENT(convert_to_c)) convert_to_c_ = convert_to_c
 
   ! Determine the shape of the array and the length of each dimension
   c_n_dims = size(dims)
