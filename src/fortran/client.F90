@@ -27,11 +27,7 @@
 ! Note the below macros are here to allow compilation with Nvidia drivers
 ! While assumed size should be sufficient, this does not seem to work with
 ! Intel and GNU (however those have support for assumed rank)
-#ifdef __NVCOMPILER
 #define DIM_RANK_SPEC dimension(*)
-#else
-#define DIM_RANK_SPEC dimension(..)
-#endif
 
 module smartredis_client
 
@@ -43,7 +39,7 @@ use, intrinsic :: iso_fortran_env, only: stderr => error_unit
 
 use smartredis_dataset, only : dataset_type
 use smartredis_configoptions, only : configoptions_type
-use fortran_c_interop, only : convert_char_array_to_c, enum_kind, C_MAX_STRING
+use fortran_c_interop, only : convert_char_array_to_c, enum_kind, C_MAX_STRING, unravel_index, c_index
 
 
 implicit none; private
@@ -528,6 +524,8 @@ function put_tensor_i8(self, name, data, dims, convert_to_c) result(code)
   integer, dimension(:),                 intent(in) :: dims !< The length of each dimension
   logical, optional,                     intent(in) :: convert_to_c
   integer(kind=enum_kind)                           :: code
+  ! Local, type-specific
+  integer(kind=TENSOR_KIND), dimension(PRODUCT(dims)), target :: c_data
 
   include 'client/put_tensor_methods_common.inc'
 
@@ -547,6 +545,8 @@ function put_tensor_i16(self, name, data, dims, convert_to_c) result(code)
   integer, dimension(:),                 intent(in) :: dims !< The length of each dimension
   logical, optional,                     intent(in) :: convert_to_c
   integer(kind=enum_kind)                           :: code
+  ! Local, type-specific
+  integer(kind=TENSOR_KIND), dimension(PRODUCT(dims)), target :: c_data
 
   include 'client/put_tensor_methods_common.inc'
 
@@ -566,6 +566,8 @@ function put_tensor_i32(self, name, data, dims, convert_to_c) result(code)
   integer, dimension(:),                 intent(in) :: dims !< The length of each dimension
   logical, optional,                     intent(in) :: convert_to_c
   integer(kind=enum_kind)                           :: code
+  ! Local, type-specific
+  integer(kind=TENSOR_KIND), dimension(PRODUCT(dims)), target :: c_data
 
   include 'client/put_tensor_methods_common.inc'
 
@@ -585,6 +587,8 @@ function put_tensor_i64(self, name, data, dims, convert_to_c) result(code)
   integer, dimension(:),                 intent(in) :: dims !< The length of each dimension
   logical, optional,                     intent(in) :: convert_to_c
   integer(kind=enum_kind)                           :: code
+  ! Local, type-specific
+  integer(kind=TENSOR_KIND), dimension(PRODUCT(dims)), target :: c_data
 
   include 'client/put_tensor_methods_common.inc'
 
@@ -604,6 +608,8 @@ function put_tensor_float(self, name, data, dims, convert_to_c) result(code)
   integer, dimension(:),                 intent(in) :: dims !< The length of each dimension
   logical, optional,                     intent(in) :: convert_to_c
   integer(kind=enum_kind)                           :: code
+  ! Local, type-specific
+  real(kind=TENSOR_KIND), dimension(PRODUCT(dims)), target :: c_data
 
   include 'client/put_tensor_methods_common.inc'
 
@@ -623,6 +629,8 @@ function put_tensor_double(self, name, data, dims, convert_to_c) result(code)
   integer, dimension(:),                 intent(in) :: dims !< The length of each dimension
   logical, optional,                     intent(in) :: convert_to_c
   integer(kind=enum_kind)                           :: code
+  ! Local, type-specific
+  real(kind=TENSOR_KIND), dimension(PRODUCT(dims)), target :: c_data
 
   include 'client/put_tensor_methods_common.inc'
 

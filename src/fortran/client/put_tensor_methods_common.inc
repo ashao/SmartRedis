@@ -34,15 +34,29 @@
   integer(kind=c_size_t), target :: c_dims(size(dims))
   integer(kind=enum_kind) :: data_type
   logical :: convert_to_c_
+  integer :: i
+  integer, dimension(PRODUCT(dims)) :: c_indices
+  integer, dimension(SIZE(dims)) :: array_idx
 
   convert_to_c_ = .true.
   if(PRESENT(convert_to_c)) convert_to_c_ = convert_to_c
 
   ! Determine the shape of the array and the length of each dimension
   c_n_dims = size(dims)
-  ! array = reshape(array, shape=shape(c_n_dims:1:-1), order=[(i, i=c_n_dims, 1, -1)])
-  ! Create the pointer to the data array
-  data_ptr = c_loc(data)
+  if (convert_to_c_) then
+    do i=1,PRODUCT(dims)
+      call unravel_index(i, dims, array_idx)
+      c_indices(i) = c_index(array_idx, dims)
+    enddo
+    ! Note do not combine this loop with the above because the out of order access
+    ! this will cause cache thrashing
+    do i=1,PRODUCT(dims)
+      c_data(c_indices(i)) = data(i)
+    enddo
+    data_ptr = c_loc(c_data)
+  else
+    data_ptr = c_loc(data)
+  endif
 
   ! Process the name and calculate its length
   c_name = trim(name)

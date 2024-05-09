@@ -27,11 +27,7 @@
 ! Note the below macros are here to allow compilation with Nvidia drivers
 ! While assumed size should be sufficient, this does not seem to work with
 ! Intel and GNU (however those have support for assumed rank)
-#ifdef __NVCOMPILER
 #define DIM_RANK_SPEC dimension(*)
-#else
-#define DIM_RANK_SPEC dimension(..)
-#endif
 
 module smartredis_dataset
 
