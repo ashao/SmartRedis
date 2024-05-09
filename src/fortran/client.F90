@@ -28,6 +28,8 @@
 ! While assumed size should be sufficient, this does not seem to work with
 ! Intel and GNU (however those have support for assumed rank)
 #define DIM_RANK_SPEC dimension(*)
+#define PUT_RANK_SPEC :,:,:,:
+#define UNPACK_RANK_SPEC dimension(:,:,:,:)
 
 module smartredis_client
 
@@ -518,11 +520,11 @@ end function poll_key
 !> Put a tensor whose Fortran type is the equivalent 'int8' C-type
 function put_tensor_i8(self, name, data, dims, convert_to_c) result(code)
 #define TENSOR_KIND c_int8_t
-  integer(kind=TENSOR_KIND), DIM_RANK_SPEC, target, intent(in) :: data !< Data to be sent
+  integer(kind=TENSOR_KIND), target, intent(in) :: data(PUT_RANK_SPEC) !< Data to be sent
   class(client_type),                    intent(in) :: self !< Fortran SmartRedis client
   character(len=*),                      intent(in) :: name !< The unique name used to store in the database
   integer, dimension(:),                 intent(in) :: dims !< The length of each dimension
-  logical, optional,                     intent(in) :: convert_to_c
+  logical,                               intent(in) :: convert_to_c
   integer(kind=enum_kind)                           :: code
   ! Local, type-specific
   integer(kind=TENSOR_KIND), dimension(PRODUCT(dims)), target :: c_data
@@ -539,11 +541,11 @@ end function put_tensor_i8
 !> Put a tensor whose Fortran type is the equivalent 'int16' C-type
 function put_tensor_i16(self, name, data, dims, convert_to_c) result(code)
 #define TENSOR_KIND c_int16_t
-  integer(kind=TENSOR_KIND), DIM_RANK_SPEC, target, intent(in) :: data !< Data to be sent
+  integer(kind=TENSOR_KIND), target, intent(in) :: data(PUT_RANK_SPEC) !< Data to be sent
   class(client_type),                    intent(in) :: self !< Fortran SmartRedis client
   character(len=*),                      intent(in) :: name !< The unique name used to store in the database
   integer, dimension(:),                 intent(in) :: dims !< The length of each dimension
-  logical, optional,                     intent(in) :: convert_to_c
+  logical,                               intent(in) :: convert_to_c
   integer(kind=enum_kind)                           :: code
   ! Local, type-specific
   integer(kind=TENSOR_KIND), dimension(PRODUCT(dims)), target :: c_data
@@ -560,11 +562,11 @@ end function put_tensor_i16
 !> Put a tensor whose Fortran type is the equivalent 'int32' C-type
 function put_tensor_i32(self, name, data, dims, convert_to_c) result(code)
 #define TENSOR_KIND c_int32_t
-  integer(kind=TENSOR_KIND), DIM_RANK_SPEC, target, intent(in) :: data !< Data to be sent
+  integer(kind=TENSOR_KIND), target, intent(in) :: data(PUT_RANK_SPEC) !< Data to be sent
   class(client_type),                    intent(in) :: self !< Fortran SmartRedis client
   character(len=*),                      intent(in) :: name !< The unique name used to store in the database
   integer, dimension(:),                 intent(in) :: dims !< The length of each dimension
-  logical, optional,                     intent(in) :: convert_to_c
+  logical,                               intent(in) :: convert_to_c
   integer(kind=enum_kind)                           :: code
   ! Local, type-specific
   integer(kind=TENSOR_KIND), dimension(PRODUCT(dims)), target :: c_data
@@ -581,11 +583,11 @@ end function put_tensor_i32
 !> Put a tensor whose Fortran type is the equivalent 'int64' C-type
 function put_tensor_i64(self, name, data, dims, convert_to_c) result(code)
 #define TENSOR_KIND c_int64_t
-  integer(kind=TENSOR_KIND), DIM_RANK_SPEC, target, intent(in) :: data !< Data to be sent
+  integer(kind=TENSOR_KIND), target, intent(in) :: data(PUT_RANK_SPEC) !< Data to be sent
   class(client_type),                    intent(in) :: self !< Fortran SmartRedis client
   character(len=*),                      intent(in) :: name !< The unique name used to store in the database
   integer, dimension(:),                 intent(in) :: dims !< The length of each dimension
-  logical, optional,                     intent(in) :: convert_to_c
+  logical,                               intent(in) :: convert_to_c
   integer(kind=enum_kind)                           :: code
   ! Local, type-specific
   integer(kind=TENSOR_KIND), dimension(PRODUCT(dims)), target :: c_data
@@ -602,11 +604,11 @@ end function put_tensor_i64
 !> Put a tensor whose Fortran type is the equivalent 'float' C-type
 function put_tensor_float(self, name, data, dims, convert_to_c) result(code)
 #define TENSOR_KIND c_float
-  real(kind=TENSOR_KIND), DIM_RANK_SPEC, target, intent(in) :: data !< Data to be sent
   class(client_type),                    intent(in) :: self !< Fortran SmartRedis client
   character(len=*),                      intent(in) :: name !< The unique name used to store in the database
+  real(kind=TENSOR_KIND), target, intent(in) :: data(PUT_RANK_SPEC) !< Data to be sent
   integer, dimension(:),                 intent(in) :: dims !< The length of each dimension
-  logical, optional,                     intent(in) :: convert_to_c
+  logical,                               intent(in) :: convert_to_c
   integer(kind=enum_kind)                           :: code
   ! Local, type-specific
   real(kind=TENSOR_KIND), dimension(PRODUCT(dims)), target :: c_data
@@ -623,11 +625,11 @@ end function put_tensor_float
 !> Put a tensor whose Fortran type is the equivalent 'double' C-type
 function put_tensor_double(self, name, data, dims, convert_to_c) result(code)
 #define TENSOR_KIND c_double
-  real(kind=TENSOR_KIND), DIM_RANK_SPEC, target, intent(in) :: data !< Data to be sent
+  real(kind=TENSOR_KIND), target, intent(in) :: data(PUT_RANK_SPEC) !< Data to be sent
   class(client_type),                    intent(in) :: self !< Fortran SmartRedis client
   character(len=*),                      intent(in) :: name !< The unique name used to store in the database
   integer, dimension(:),                 intent(in) :: dims !< The length of each dimension
-  logical, optional,                     intent(in) :: convert_to_c
+  logical,                               intent(in) :: convert_to_c
   integer(kind=enum_kind)                           :: code
   ! Local, type-specific
   real(kind=TENSOR_KIND), dimension(PRODUCT(dims)), target :: c_data
@@ -643,7 +645,7 @@ end function put_tensor_double
 
 !> Put a tensor whose Fortran type is the equivalent 'int8' C-type
 function unpack_tensor_i8(self, name, result, dims) result(code)
-  integer(kind=c_int8_t), DIM_RANK_SPEC, target, intent(out) :: result !< Data to be sent
+  integer(kind=c_int8_t), UNPACK_RANK_SPEC, target, intent(out) :: result !< Data to be sent
   class(client_type),                   intent(in) :: self  !< Pointer to the initialized client
   character(len=*),                     intent(in) :: name  !< The name to use to place the tensor
   integer, dimension(:),                intent(in) :: dims  !< Length along each dimension of the tensor
@@ -659,7 +661,7 @@ end function unpack_tensor_i8
 
 !> Put a tensor whose Fortran type is the equivalent 'int16' C-type
 function unpack_tensor_i16(self, name, result, dims) result(code)
-  integer(kind=c_int16_t), DIM_RANK_SPEC, target, intent(out) :: result !< Data to be sent
+  integer(kind=c_int16_t), UNPACK_RANK_SPEC, target, intent(out) :: result !< Data to be sent
   class(client_type),                   intent(in) :: self  !< Pointer to the initialized client
   character(len=*),                     intent(in) :: name  !< The name to use to place the tensor
   integer, dimension(:),                intent(in) :: dims  !< Length along each dimension of the tensor
@@ -675,7 +677,7 @@ end function unpack_tensor_i16
 
 !> Put a tensor whose Fortran type is the equivalent 'int32' C-type
 function unpack_tensor_i32(self, name, result, dims) result(code)
-  integer(kind=c_int32_t), DIM_RANK_SPEC, target, intent(out) :: result !< Data to be sent
+  integer(kind=c_int32_t), UNPACK_RANK_SPEC, target, intent(out) :: result !< Data to be sent
   class(client_type),                   intent(in) :: self  !< Pointer to the initialized client
   character(len=*),                     intent(in) :: name  !< The name to use to place the tensor
   integer, dimension(:),                intent(in) :: dims  !< Length along each dimension of the tensor
@@ -691,7 +693,7 @@ end function unpack_tensor_i32
 
 !> Put a tensor whose Fortran type is the equivalent 'int64' C-type
 function unpack_tensor_i64(self, name, result, dims) result(code)
-  integer(kind=c_int64_t), DIM_RANK_SPEC, target, intent(out) :: result !< Data to be sent
+  integer(kind=c_int64_t), UNPACK_RANK_SPEC, target, intent(out) :: result !< Data to be sent
   class(client_type),                   intent(in) :: self  !< Pointer to the initialized client
   character(len=*),                     intent(in) :: name  !< The name to use to place the tensor
   integer, dimension(:),                intent(in) :: dims  !< Length along each dimension of the tensor
@@ -707,7 +709,7 @@ end function unpack_tensor_i64
 
 !> Put a tensor whose Fortran type is the equivalent 'float' C-type
 function unpack_tensor_float(self, name, result, dims) result(code)
-  real(kind=c_float), DIM_RANK_SPEC, target, intent(out) :: result !< Data to be sent
+  real(kind=c_float), UNPACK_RANK_SPEC, target, intent(out) :: result !< Data to be sent
   class(client_type),                   intent(in) :: self  !< Pointer to the initialized client
   character(len=*),                     intent(in) :: name  !< The name to use to place the tensor
   integer, dimension(:),                intent(in) :: dims  !< Length along each dimension of the tensor
@@ -722,12 +724,14 @@ function unpack_tensor_float(self, name, result, dims) result(code)
 end function unpack_tensor_float
 
 !> Put a tensor whose Fortran type is the equivalent 'double' C-type
-function unpack_tensor_double(self, name, result, dims) result(code)
-  real(kind=c_double), DIM_RANK_SPEC, target, intent(out) :: result !< Data to be sent
+function unpack_tensor_double(self, name, result, dims, convert_from_c) result(code)
+  real(kind=c_double), UNPACK_RANK_SPEC, target, intent(out) :: result !< Data to be sent
   class(client_type),                   intent(in) :: self  !< Pointer to the initialized client
   character(len=*),                     intent(in) :: name  !< The name to use to place the tensor
-  integer, dimension(:),                intent(in) :: dims  !< Length along each dimension of the tensor
+  integer, dimension(4),                intent(in) :: dims  !< Length along each dimension of the tensor
+  logical,                              intent(in) :: convert_from_c
   integer(kind=enum_kind)                          :: code
+  real(kind=c_double), dimension(PRODUCT(dims)) :: flat_buffer
 
   include 'client/unpack_tensor_methods_common.inc'
 
@@ -735,6 +739,21 @@ function unpack_tensor_double(self, name, result, dims) result(code)
   data_type = tensor_dbl
   code = unpack_tensor_c(self%client_ptr, c_name, name_length, data_ptr, c_dims_ptr, &
     c_n_dims, data_type, mem_layout)
+
+  if (convert_from_c) then
+    count = 0
+    do l=1,dims(4); do k=1,dims(3); do j=1,dims(2); do i=1,dims(1)
+      count = count + 1
+      c_indices(count) = c_index(array_idx, [i,j,k,l])
+    enddo; enddo; enddo; enddo;
+    ! Note do not combine this loop with the above because the out of order access
+    ! this will cause cache thrashing
+    do l=1,dims(4); do k=1,dims(3); do j=1,dims(2); do i=1,dims(1)
+      flat_buffer(c_indices(i)) = result(i,j,k,l)
+    enddo; enddo; enddo; enddo;
+
+    result = reshape(flat_buffer, dims)
+  endif
 end function unpack_tensor_double
 
 !> Move a tensor to a new name

@@ -33,6 +33,10 @@
   integer(kind=c_size_t), target :: c_dims(size(dims))
   integer(kind=enum_kind) :: data_type, mem_layout
 
+  integer :: i, j, k, l, count
+  integer, dimension(PRODUCT(dims)) :: c_indices
+  integer, dimension(SIZE(dims)) :: array_idx
+
   c_name = trim(name)
   name_length = len_trim(name)
   data_ptr = c_loc(result)

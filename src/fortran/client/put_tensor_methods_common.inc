@@ -33,26 +33,19 @@
   integer(kind=c_size_t) :: name_length
   integer(kind=c_size_t), target :: c_dims(size(dims))
   integer(kind=enum_kind) :: data_type
-  logical :: convert_to_c_
-  integer :: i
+  integer :: i, j, k, l
   integer, dimension(PRODUCT(dims)) :: c_indices
   integer, dimension(SIZE(dims)) :: array_idx
 
-  convert_to_c_ = .true.
-  if(PRESENT(convert_to_c)) convert_to_c_ = convert_to_c
-
-  ! Determine the shape of the array and the length of each dimension
-  c_n_dims = size(dims)
-  if (convert_to_c_) then
-    do i=1,PRODUCT(dims)
-      call unravel_index(i, dims, array_idx)
-      c_indices(i) = c_index(array_idx, dims)
-    enddo
+  if (convert_to_c) then
+    do l=1,dims(4); do k=1,dims(3); do j=1,dims(2); do i=1,dims(1)
+      c_indices(i) = c_index(array_idx, [i,j,k,l])
+    enddo; enddo; enddo; enddo;
     ! Note do not combine this loop with the above because the out of order access
     ! this will cause cache thrashing
-    do i=1,PRODUCT(dims)
-      c_data(c_indices(i)) = data(i)
-    enddo
+    do l=1,dims(4); do k=1,dims(3); do j=1,dims(2); do i=1,dims(1)
+      c_data(c_indices(i)) = data(i,j,k,l)
+    enddo; enddo; enddo; enddo;
     data_ptr = c_loc(c_data)
   else
     data_ptr = c_loc(data)
