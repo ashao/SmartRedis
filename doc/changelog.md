@@ -6,6 +6,7 @@ Released on 14 May 2024
 
 Description
 
+-   Streamline compilation of SmartRedis dependencies
 -   Improve client error logging
 -   Fix pylint regression error
 -   Fix build wheel error
@@ -30,6 +31,12 @@ Description
 
 Detailed Notes
 
+-   hiredis, redis++, and pybind are now retrieved and installed
+    in `CMakeLists.txt` instead of in the Makefile. This decouples the
+    user-facing side of SmartRedis from the Makefile, which now can be
+    used as a convenient interface to compile SmartRedis with various
+    options and coordinate testing
+    ([PR497](https://github.com/CrayLabs/SmartRedis/pull/497))
 -   Ensure errors raised from client include details
     ([PR485](https://github.com/CrayLabs/SmartRedis/pull/485))
 -   Pin pylint to fix regression error
