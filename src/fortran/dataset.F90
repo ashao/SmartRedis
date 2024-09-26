@@ -153,6 +153,7 @@ subroutine final_destructor(self)
   type(dataset_type), intent(inout) :: self
   integer :: code
 
+  code = 0
   if (c_associated(self%dataset_ptr)) code = dataset_deconstructor(self%dataset_ptr)
 end subroutine final_destructor
 
