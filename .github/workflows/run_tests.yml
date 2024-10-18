@@ -84,10 +84,10 @@ jobs:
           remove-docker-images: true
 
       # download a copy of SmartRedis before running CI tests
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # Setup python within the container
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.py_v }}
 
