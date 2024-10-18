@@ -57,7 +57,7 @@ env:
 jobs:
 
   run_tests:
-    name: Run smartredis tests using ${{ matrix.os }}, Python ${{ matrix.py_v }}, and ${{ matrix.compiler }}
+    name: Python ${{ matrix.py_v }}, ${{ matrix.compiler }}, ${{ matrix.link_type }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
