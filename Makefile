@@ -59,6 +59,7 @@ SR_TEST_PORT := 6379
 SR_TEST_NODES := 3
 SR_TEST_REDISAI_VER := v1.2.7
 SR_TEST_DEVICE := cpu
+SR_TEST_DEVICE_UPPER := $(shell echo $(SR_TEST_DEVICE) | tr '[:lower:]' '[:upper:]')
 SR_TEST_PYTEST_FLAGS := -vv -s
 ifeq ($(LINK_TYPE), shared)
 	BUILD_SHARED_LIBS=on
@@ -66,6 +67,12 @@ else
 	BUILD_SHARED_LIBS=off
 endif
 SR_TEST_INSTALL_PREFIX = $(CWD)/install/$(BUILD_TYPE)/$(LINK_TYPE)
+
+LIBTORCH_CPU_URL = https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.3.1%2Bcpu.zip
+LIBTORCH_CUDA11_URL = https://download.pytorch.org/libtorch/cu118/libtorch-cxx11-abi-shared-with-deps-2.3.1%2Bcu118.zip
+
+TORCH_CPU_PIP = pip install torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1 --index-url https://download.pytorch.org/whl/cpu
+TORCH_CUDA11_PIP = pip install torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1 --index-url https://download.pytorch.org/whl/cu118
 # Do not remove this block. It is used by the 'help' rule when
 # constructing the help output.
 # help:
@@ -503,10 +510,10 @@ test-examples:
 ############################################################################
 # hidden build targets for third-party software
 
-# cudann-check (hidden test target)
+# cudnn-check (hidden test target)
 # checks cuda dependencies for GPU build
-.PHONY: cudann-check
-cudann-check:
+.PHONY: cudnn-check
+cudnn-check:
 ifeq ($(SR_TEST_DEVICE),gpu)
 ifndef CUDA_HOME
 	$(error ERROR: CUDA_HOME is not set)
@@ -543,25 +550,26 @@ third-party/RedisAI:
 	@mkdir -p third-party
 	@cd third-party && \
 	rm -rf RedisAI/$(SR_TEST_REDISAI_VER) && \
-	GIT_LFS_SKIP_SMUDGE=1 git clone --recursive $(REDISAI_URL) RedisAI/$(SR_TEST_REDISAI_VER) \
+	GIT_LFS_SKIP_SMUDGE=1 git clone $(REDISAI_URL) RedisAI/$(SR_TEST_REDISAI_VER) \
 		--branch $(SR_TEST_REDISAI_VER) --depth=1
 
 .PHONY: redisAI
-redisAI: cudann-check
+redisAI: cudnn-check
+redisAI: pytorch
+redisAI: dlpack
 redisAI: third-party/RedisAI/$(SR_TEST_REDISAI_VER)/install-$(SR_TEST_DEVICE)/redisai.so
 third-party/RedisAI/$(SR_TEST_REDISAI_VER)/install-$(SR_TEST_DEVICE)/redisai.so: third-party/RedisAI
-	@echo in third-party/RedisAI/$(SR_TEST_REDISAI_VER)/install-$(SR_TEST_DEVICE)/redisai.so:
-	$(eval DEVICE_IS_GPU := $(shell test $(SR_TEST_DEVICE) == "cpu"; echo $$?))
 	@cd third-party/RedisAI/$(SR_TEST_REDISAI_VER) && \
-		WITH_PT=1 WITH_TF=1 WITH_TFLITE=0 WITH_ORT=0 bash get_deps.sh \
-		$(SR_TEST_DEVICE)
-	@cd third-party/RedisAI/$(SR_TEST_REDISAI_VER) && \
-		GPU=$(DEVICE_IS_GPU) WITH_PT=1 WITH_TF=1 WITH_TFLITE=0 WITH_ORT=0 \
-		WITH_PT=1 WITH_TF=1 WITH_TFLITE=0 WITH_ORT=0 bash get_deps.sh \
-		WITH_UNIT_TESTS=0 make CC=$(DEP_CC) CXX=$(DEP_CXX) -j $(NPROC) -C opt clean
-	@cd third-party/RedisAI/$(SR_TEST_REDISAI_VER) && \
-		GPU=$(DEVICE_IS_GPU) WITH_PT=1 WITH_TF=1 WITH_TFLITE=0 WITH_ORT=0 \
-		WITH_UNIT_TESTS=0 make CC=$(DEP_CC) CXX=$(DEP_CXX) -C opt && \
+		mkdir -p build-$(SR_TEST_DEVICE) && cd build-$(SR_TEST_DEVICE) && \
+		sed -E -i "s/CXX_STANDARD (11|14)/CXX_STANDARD 17/g" ../src/backends/libtorch_c/CMakeLists.txt && \
+		cmake -DBUILD_TF=0 -DBUILD_ORT=0 -DBUILD_TORCH=1 -DBUILD_TFLITE=0 \
+			  -DDEPS_PATH=$(CWD)/third-party/backends \
+			  -DDEVICE=$(SR_TEST_DEVICE) \
+			  -DINSTALL_PATH=../install-$(SR_TEST_DEVICE) \
+			  -DCMAKE_C_COMPILER=$(DEP_CC) \
+			  -DCMAKE_CXX_COMPILER=$(DEP_CXX) ../ && \
+		make -j install && \
+		chmod +x ../install-$(SR_TEST_DEVICE)/redisai.so
 	echo "Finished installing RedisAI"
 
 # Catch2 (hidden test target)
@@ -586,4 +594,15 @@ third-party/lcov/install/bin/lcov:
 	make CC=$(DEP_CC) CXX=$(DEP_CXX) PREFIX=$(CWD)/third-party/lcov/install/ install && \
 	echo "Finished installing LCOV"
 
+.PHONY: dlpack
+dlpack: third-party/backends/dlpack
+third-party/backends/dlpack:
+	git clone --branch v0.5_RAI https://github.com/RedisAI/dlpack.git $@
 
+.PHONY: pytorch
+pytorch: third-party/backends/libtorch
+third-party/backends/libtorch:
+	@mkdir -p third-party/backends
+	wget -O third-party/backends/libtorch.zip $(LIBTORCH_$(SR_TEST_DEVICE_UPPER)_URL)
+	cd third-party/backends && unzip libtorch.zip && rm libtorch.zip
+	$(TORCH_$(SR_TEST_DEVICE_UPPER)_PIP)

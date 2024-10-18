@@ -6,10 +6,15 @@ Released on 27 September, 2024
 
 Description
 
+-  Fix RedisAI build to allow for compilation with GCC-14
 -  Fix a memory leak in the Fortran Dataset implementation
 
 Detailed Notes
 
+-  Fix RedisAI build to allow for compilation with GCC-14. Also,
+   we only use the Torch backend and change the compilation of
+   RedisAI to use CMake (like SmartSim)
+   ([PR518](https://github.com/CrayLabs/SmartRedis/pull/518))
 -  The dataset object, if used in a loop, would leave memory dangling.
    To alleviate this, a final procedure has been implemented. Fortran
    compilers, however, are notoriously bad at detecting when an object
