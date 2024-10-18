@@ -356,7 +356,7 @@ define run_smartredis_tests_with_standalone_server
 	(testresult=$$?; \
 	echo "Shutting down standalone Redis server" && \
 	python utils/launch_redis.py --port $(SR_TEST_PORT) --nodes 1 --stop && \
-	test $$testresult -eq 0 || echo "Standalone tests failed"; exit $$testresult) && \
+	test $$testresult -eq 0 || cat *.log; exit $$testresult) && \
 	echo "Standalone tests complete"
 endef
 
@@ -377,7 +377,7 @@ define run_smartredis_tests_with_clustered_server
 	echo "Shutting down clustered Redis server" && \
 	python utils/launch_redis.py --port $(SR_TEST_PORT) \
 		--nodes $(SR_TEST_NODES) --stop; \
-	test $$testresult -eq 0 || echo "Clustered tests failed"; exit $$testresult) && \
+	test $$testresult -eq 0 || cat *.log; exit $$testresult) && \
 	echo "Clustered tests complete"
 endef
 
@@ -400,7 +400,7 @@ define run_smartredis_tests_with_uds_server
 	echo "Shutting down standalone Redis server with Unix Domain Socket support" && \
 	python utils/launch_redis.py --port $(SR_TEST_PORT) --nodes 1 \
 		--udsport $(SR_TEST_UDS_FILE) --stop; \
-	test $$testresult -eq 0 || echo "UDS tests failed"; exit $$testresult) && \
+	test $$testresult -eq 0 || cat *.log; exit $$testresult) && \
 	echo "UDS tests complete"
 endef
 
