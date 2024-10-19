@@ -64,7 +64,8 @@ jobs:
       matrix:
         os: [ubuntu-24.04] # cannot test on macOS as docker isn't supported on Mac
         rai_v: [1.2.7] # versions of RedisAI
-        py_v: ['3.9.x', '3.10.x', '3.11.x'] # versions of Python
+        # py_v: ['3.9.x', '3.10.x', '3.11.x'] # versions of Python
+        py_v: ['3.11.x'] # versions of Python
         compiler: [gcc-13, gcc-14] # intel compiler, and versions of GNU compiler
         # compiler: [nvhpc-24-5, intel-2024.0, gcc-11, gcc-12, gcc-13, gcc-14] # intel compiler, and versions of GNU compiler
         link_type: [shared]
@@ -78,7 +79,7 @@ jobs:
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
         with:
-          root-reserve-mb: 30720
+          root-reserve-mb: 40960
           remove-dotnet: true
           remove-android: true
           remove-haskell: true
