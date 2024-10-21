@@ -188,7 +188,7 @@ jobs:
         run: |
           make test-examples INSTALL_PREFIX=$PWD/install/$LINK_TYPE \
             BUILD_FORTRAN=ON BUILD_PYTHON=ON LINK_TYPE=$LINK_TYPE \
-            SR_TEST_PORT=6379 SR_TEST_REDISAI_VER=v${{ matrix.rai_v }} \
+            SR_TEST_PORT=7000 SR_TEST_REDISAI_VER=v${{ matrix.rai_v }} \
             INSTALL_PREFIX=$PWD/install/$LINK_TYPE
 
       # Run the tests using various DB deployments
@@ -196,7 +196,7 @@ jobs:
         run: |
           make test-verbose-with-coverage INSTALL_PREFIX=$PWD/install/$LINK_TYPE \
             COV_FLAGS="--cov=./src/python/module/smartredis/ --cov-report=xml --cov-append" \
-            BUILD_FORTRAN=ON BUILD_PYTHON=ON SR_TEST_REDIS_MODE=All SR_TEST_PORT=7379 LINK_TYPE=$LINK_TYPE \
+            BUILD_FORTRAN=ON BUILD_PYTHON=ON SR_TEST_REDIS_MODE=All SR_TEST_PORT=7000 LINK_TYPE=$LINK_TYPE \
             SR_TEST_REDISAI_VER=v${{ matrix.rai_v }}
 
       # Process and upload code coverage (Python was collected during pytest)

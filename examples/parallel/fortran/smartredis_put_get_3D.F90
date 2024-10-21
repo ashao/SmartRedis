@@ -49,9 +49,10 @@ program main
   character(len=9) :: key_prefix
 
   ! Initialize MPI
-  call MPI_init( err_code )
-  call MPI_comm_rank( MPI_COMM_WORLD, pe_id, err_code)
+  call MPI_init(err_code)
+  call MPI_comm_rank(MPI_COMM_WORLD, pe_id, err_code)
   write(key_prefix, "(A,I6.6)") "pe_",pe_id
+  print *, "Key Prefix: ", key_prefix
 
   call random_number(true_array_real_64)
   call random_number(recv_array_real_64)
@@ -65,7 +66,6 @@ program main
   if (result .ne. SRNoError) error stop 'client%put_tensor failed'
   result = client%unpack_tensor(key_prefix//"true_array_real_64", recv_array_real_64, shape(recv_array_real_64))
   if (result .ne. SRNoError) error stop 'client%unpack_tensor failed'
-  print *, "PE ID: ", pe_id
   print *, "Sent: ", true_array_real_64
   print *, "Received: ", recv_array_real_64
   if (.not. all(true_array_real_64 == recv_array_real_64)) error stop 'true_array_real_64: FAILED'
